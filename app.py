@@ -18,18 +18,24 @@ import imaplib
 import email
 from email.header import decode_header
 from oauth2client.service_account import ServiceAccountCredentials
+import json
 
-
-# Configuration des accès
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-# On lit la clé depuis les Secrets Streamlit
+# 2. On récupère le secret (qui est du texte dans Streamlit)
 if "GCP_JSON" in st.secrets:
+    # CETTE LIGNE EST LA SOLUTION : 
+    # Elle transforme le texte (str) en dictionnaire exploitable
     info_cles = json.loads(st.secrets["GCP_JSON"])
+    
+    # On utilise 'info_cles' (le dictionnaire) et non 'st.secrets["GCP_JSON"]' directement
     creds = ServiceAccountCredentials.from_json_keyfile_dict(info_cles, scope)
     client = gspread.authorize(creds)
+    
+    # Ouverture de ton fichier
+    sheet = client.open("Configuration_Questions").sheet1
 else:
-    st.error("Configurez les Secrets GCP_JSON sur Streamlit Cloud !")
+    st.error("Le secret GCP_JSON est manquant !")
 
 
 def connecter_drive():
@@ -664,4 +670,5 @@ elif st.session_state.page == "Paramètres":
                 else:
 
                     t.error("Les mots de passe ne correspondent pas ou sont trop courts (min 4 car.).")
+
 
