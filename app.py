@@ -22,21 +22,24 @@ import json
 
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-# 2. On récupère le secret (qui est du texte dans Streamlit)
 if "GCP_JSON" in st.secrets:
-    # CETTE LIGNE EST LA SOLUTION : 
-    # Elle transforme le texte (str) en dictionnaire exploitable
-    info_cles = json.loads(st.secrets["GCP_JSON"])
+    secret_data = st.secrets["GCP_JSON"]
     
-    # On utilise 'info_cles' (le dictionnaire) et non 'st.secrets["GCP_JSON"]' directement
+    # TEST : Si c'est du texte, on le convertit. Si c'est déjà un dictionnaire, on le garde tel quel.
+    if isinstance(secret_data, str):
+        info_cles = json.loads(secret_data)
+    else:
+        info_cles = secret_data
+    
+    # Connexion
     creds = ServiceAccountCredentials.from_json_keyfile_dict(info_cles, scope)
     client = gspread.authorize(creds)
     
-    # Ouverture de ton fichier
+    # Ouverture du fichier
     sheet = client.open("Configuration_Questions").sheet1
 else:
-    st.error("Le secret GCP_JSON est manquant !")
-
+    st.error("Secret GCP_JSON non trouvé.")
+    
 
 def connecter_drive():
     scope = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"]
@@ -670,5 +673,6 @@ elif st.session_state.page == "Paramètres":
                 else:
 
                     t.error("Les mots de passe ne correspondent pas ou sont trop courts (min 4 car.).")
+
 
 
