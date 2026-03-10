@@ -41,7 +41,7 @@ def connecter_drive():
         creds = Credentials.from_service_account_file(path_to_json, scopes=scope)
     else:
         # SI TU ES SUR STREAMLIT CLOUD (plus tard) :
-        creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
+        creds = Credentials.from_service_account_info(st.secrets["GCP_JSON"], scopes=scope)
         
     return gspread.authorize(creds)
 
@@ -664,3 +664,4 @@ elif st.session_state.page == "Paramètres":
                 else:
 
                     t.error("Les mots de passe ne correspondent pas ou sont trop courts (min 4 car.).")
+
