@@ -17,6 +17,20 @@ import datetime
 import imaplib
 import email
 from email.header import decode_header
+from oauth2client.service_account import ServiceAccountCredentials
+
+
+# Configuration des accès
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+
+# On lit la clé depuis les Secrets Streamlit
+if "GCP_JSON" in st.secrets:
+    info_cles = json.loads(st.secrets["GCP_JSON"])
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(info_cles, scope)
+    client = gspread.authorize(creds)
+else:
+    st.error("Configurez les Secrets GCP_JSON sur Streamlit Cloud !")
+
 
 def connecter_drive():
     scope = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"]
@@ -648,4 +662,5 @@ elif st.session_state.page == "Paramètres":
                     st.info("Déconnexion automatique... Veuillez vous reconnecter avec le nouveau code.")
                     st.rerun()
                 else:
+
                     t.error("Les mots de passe ne correspondent pas ou sont trop courts (min 4 car.).")
